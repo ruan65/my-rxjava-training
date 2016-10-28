@@ -68,5 +68,8 @@ public class RxJavaExample3 {
 
         from.subscribe(it -> System.out.println("[" + it + "]"));
 
+        from.map(it -> it.hashCode())
+                .subscribe(System.out::println);
+
     }
 }
