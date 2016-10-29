@@ -12,12 +12,18 @@ import java.util.List;
 public class RxJavaExample4 {
 
     public static Observable<String> getFirst2Letters(String s) {
-        return Observable.just(s.substring(0, 2));
+
+        try {
+            return Observable.just(s.substring(0, 2));
+        } catch (Exception ex) {
+            return Observable.just("null");
+        }
     }
 
     public static void main(String[] args) {
 
-        Observable<List<String>> just = Observable.just(Arrays.asList("one", "two", "three", "ok", "aha!!!!", "zahhhhhhqaa"));
+        Observable<List<String>> just = Observable.just(Arrays.asList("one", "two", "0", "three", "ok", "aha!!!!",
+                "zahhhhhhqaa", "0"));
 
 
 //        just.subscribe(it -> System.out.println(it));
@@ -30,15 +36,23 @@ public class RxJavaExample4 {
 //            }
 //        });
 
-        just
-                .flatMap(it -> Observable.from(it))
-                .flatMap(it -> getFirst2Letters(it))
-                .map(it -> it.toUpperCase())
-                .map(it -> it + "!!!")
-//                .subscribe(it -> System.out.println(it));
+        try {
+            just
+                    .flatMap(it -> Observable.from(it))
+                    .doOnNext(it -> System.out.println(it))
+                    .take(2)
+                    .flatMap(it -> getFirst2Letters(it))
+                    .filter(it -> !it.equals("null"))
+                    .map(it -> it.toUpperCase())
+                    .doOnNext(it -> System.out.println(it))
+                    .flatMap(it -> Observable.just(it + "!!!"))
+    //                .subscribe(it -> System.out.println(it));
 
-        .subscribe(s -> System.out.println(s),
-                er -> System.out.println(er.getCause()),
-                () -> System.out.println("We have completed!!!"));
+                    .subscribe(s -> System.out.println(s),
+                            er -> System.out.println(er.getCause()),
+                            () -> System.out.println("We have completed!!!"));
+        } catch (Exception e) {
+            // hihi
+        }
     }
 }
